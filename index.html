@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Archivio progetti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--surface:#f4f5f7;--ink:#1b1f23;--muted:#66707a;--line:#e3e6ea;--accent:#2347c5;--accent-ink:#fff;--danger:#b3261e;
+--font:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#14171a;--surface:#1e2327;--ink:#eceff1;--muted:#98a2ab;--line:#2c3339;--accent:#8aa4ff;--accent-ink:#10162e;--danger:#f2b8b5}}
+*{box-sizing:border-box}
+html{color-scheme:light dark}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--font)}
+.wrap{max-width:820px;margin:0 auto;padding:56px 22px 80px}
+h1{font-size:clamp(2.2rem,6vw,3.2rem);line-height:1.05;letter-spacing:-.03em;margin:0 0 .3em;font-weight:700}
+.lead{color:var(--muted);margin:0 0 32px;max-width:52ch}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.tools input[type=search]{flex:1 1 220px}
+input,select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 12px;width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.chip{border:1px solid var(--line);background:none;border-radius:99px;padding:4px 14px;cursor:pointer;color:var(--muted)}
+.chip[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:9px 16px;font-weight:500;cursor:pointer;width:auto}
+.btn.ghost{background:none;color:var(--ink);border:1px solid var(--line)}
+.btn.small{padding:4px 10px;font-size:.875rem}
+.btn.danger{color:var(--danger)}
+ul.list{list-style:none;margin:24px 0 0;padding:0;border-top:1px solid var(--ink)}
+.row{display:grid;grid-template-columns:92px 1fr auto;gap:6px 20px;padding:20px 0;border-bottom:1px solid var(--line)}
+.date{color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums;padding-top:3px}
+.row h2{font-size:1.2rem;margin:0;letter-spacing:-.01em;line-height:1.3}
+.row h2 a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:4px;text-decoration-thickness:2px}
+.row h2 a:hover{color:var(--accent)}
+.row p{margin:4px 0 8px;color:var(--muted);max-width:60ch}
+.meta{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.875rem;color:var(--muted)}
+.meta .tag{color:var(--ink)}
+.status{font-size:.875rem;white-space:nowrap;padding-top:3px;display:flex;align-items:center;gap:7px;height:fit-content}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.s-in-corso .dot{background:var(--accent)}
+.s-completato .dot{background:#2e8b57}
+.s-in-pausa .dot{background:#d98e04}
+.actions{grid-column:2/4;display:flex;gap:6px}
+.empty{padding:40px 0;color:var(--muted)}
+.editbar{display:none;border:1px dashed var(--line);border-radius:10px;padding:14px 16px;margin-bottom:24px;background:var(--surface);gap:10px;flex-wrap:wrap;align-items:center}
+.edit .editbar{display:flex}
+.editbar span{flex:1 1 200px;color:var(--muted);font-size:.9rem}
+.row .actions{display:none}
+.edit .row .actions{display:flex}
+dialog{border:1px solid var(--line);border-radius:14px;padding:26px;width:min(560px,92vw);background:var(--bg);color:var(--ink)}
+dialog::backdrop{background:rgba(10,12,14,.5)}
+dialog h3{margin:0 0 16px;font-size:1.3rem}
+label{display:block;font-size:.9rem;font-weight:500;margin:12px 0 4px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.foot{display:flex;gap:8px;justify-content:flex-end;margin-top:22px}
+textarea.code{font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;min-height:260px}
+ol.steps{padding-left:1.2em;color:var(--muted);font-size:.9rem;margin:0 0 12px}
+footer{margin-top:48px;color:var(--muted);font-size:.85rem}
+footer a{color:inherit}
+@media (max-width:600px){.row{grid-template-columns:1fr auto}.date{grid-column:1/3;order:-1}.actions{grid-column:1/3}.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="wrap" id="app">
+  <h1>Progetti</h1>
+  <p class="lead">Un archivio di ciò che ho costruito, scritto e provato.</p>
+
+  <div class="editbar">
+    <span>Modalità modifica: le modifiche restano in questo browser finché non le pubblichi.</span>
+    <button class="btn" id="add">Nuovo progetto</button>
+    <button class="btn ghost" id="export">Esporta codice</button>
+  </div>
+
+  <div class="tools"><input type="search" id="q" placeholder="Cerca per titolo, descrizione o tag" aria-label="Cerca"></div>
+  <div class="chips" id="cats" aria-label="Filtra per categoria"></div>
+  <div class="chips" id="stats" aria-label="Filtra per stato"></div>
+
+  <ul class="list" id="list"></ul>
+
+  <footer>Aggiungi <code>?edit</code> all’indirizzo della pagina per gestire i progetti.</footer>
+</main>
+
+<dialog id="formDlg">
+  <form method="dialog" id="form">
+    <h3 id="formTitle">Nuovo progetto</h3>
+    <label for="f-title">Titolo</label>
+    <input id="f-title" required>
+    <label for="f-desc">Descrizione</label>
+    <textarea id="f-desc" rows="3"></textarea>
+    <div class="two">
+      <div><label for="f-cat">Categoria</label><input id="f-cat" list="catlist" required placeholder="Es. Software, Scrittura"><datalist id="catlist"></datalist></div>
+      <div><label for="f-status">Stato</label>
+        <select id="f-status"><option>Idea</option><option selected>In corso</option><option>In pausa</option><option>Completato</option></select></div>
+    </div>
+    <div class="two">
+      <div><label for="f-date">Data</label><input id="f-date" type="month"></div>
+      <div><label for="f-link">Link</label><input id="f-link" type="url" placeholder="https://"></div>
+    </div>
+    <label for="f-tags">Tag, separati da virgola</label>
+    <input id="f-tags" placeholder="python, prototipo">
+    <div class="foot">
+      <button type="button" class="btn ghost" data-close="formDlg">Annulla</button>
+      <button class="btn" id="save" value="save">Salva progetto</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="exportDlg">
+  <h3>Esporta codice</h3>
+  <ol class="steps">
+    <li>Copia il codice qui sotto.</li>
+    <li>Apri <code>index.html</code> su GitHub e clicca sulla matita per modificarlo.</li>
+    <li>Sostituisci il blocco <code>const PROJECTS = [...]</code> e salva con “Commit changes”.</li>
+  </ol>
+  <textarea class="code" id="out" readonly aria-label="Codice da copiare"></textarea>
+  <div class="foot">
+    <button class="btn ghost" data-close="exportDlg">Chiudi</button>
+    <button class="btn" id="copy">Copia codice</button>
+  </div>
+</dialog>
+
+<script>
+/* ===== DATI: sostituisci questo blocco con il codice esportato ===== */
+const PROJECTS = [
+  {
+    "id": "p1",
+    "title": "Diario di viaggio in Portogallo",
+    "description": "Raccolta di appunti e fotografie scattate durante il viaggio dell’estate scorsa.",
+    "category": "Scrittura",
+    "status": "In corso",
+    "date": "2026-08",
+    "link": "",
+    "tags": ["viaggi", "fotografia"]
+  },
+  {
+    "id": "p2",
+    "title": "Orto sul balcone",
+    "description": "Schema delle semine, calendario dei raccolti e note su cosa ha funzionato.",
+    "category": "Hobby",
+    "status": "Completato",
+    "date": "2026-05",
+    "link": "",
+    "tags": ["giardinaggio"]
+  },
+  {
+    "id": "p3",
+    "title": "Mini app per le liste della spesa",
+    "description": "Un piccolo strumento web per organizzare la spesa settimanale.",
+    "category": "Software",
+    "status": "Idea",
+    "date": "2026-11",
+    "link": "https://github.com",
+    "tags": ["javascript", "web"]
+  }
+];
+/* ===== FINE DATI ===== */
+
+const EDIT = new URLSearchParams(location.search).has("edit");
+const KEY = "archivio-progetti-bozza";
+let items = PROJECTS.slice();
+let fCat = "Tutte", fStat = "Tutti", query = "", editingId = null;
+
+if (EDIT) {
+  document.getElementById("app").classList.add("edit");
+  try { const d = localStorage.getItem(KEY); if (d) items = JSON.parse(d); } catch (e) {}
+}
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const persist = () => { if (EDIT) try { localStorage.setItem(KEY, JSON.stringify(items)); } catch (e) {} };
+const fmtDate = d => {
+  if (!d) return "";
+  const [y, m] = d.split("-");
+  const mesi = ["gen","feb","mar","apr","mag","giu","lug","ago","set","ott","nov","dic"];
+  return m ? mesi[+m - 1] + " " + y : y;
+};
+
+function chips(el, values, current, setter) {
+  el.innerHTML = values.map(v => `<button class="chip" aria-pressed="${v === current}" data-v="${esc(v)}">${esc(v)}</button>`).join("");
+  el.onclick = e => { const b = e.target.closest(".chip"); if (b) { setter(b.dataset.v); render(); } };
+}
+
+function render() {
+  const cats = ["Tutte", ...new Set(items.map(i => i.category).filter(Boolean))];
+  const stats = ["Tutti", ...new Set(items.map(i => i.status).filter(Boolean))];
+  if (!cats.includes(fCat)) fCat = "Tutte";
+  if (!stats.includes(fStat)) fStat = "Tutti";
+  chips($("cats"), cats, fCat, v => fCat = v);
+  chips($("stats"), stats, fStat, v => fStat = v);
+  $("catlist").innerHTML = cats.slice(1).map(c => `<option value="${esc(c)}">`).join("");
+
+  const q = query.trim().toLowerCase();
+  const shown = items
+    .filter(i => (fCat === "Tutte" || i.category === fCat) && (fStat === "Tutti" || i.status === fStat))
+    .filter(i => !q || [i.title, i.description, (i.tags || []).join(" ")].join(" ").toLowerCase().includes(q))
+    .sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+
+  $("list").innerHTML = shown.length ? shown.map(i => `
+    <li class="row">
+      <div class="date">${esc(fmtDate(i.date))}</div>
+      <div>
+        <h2>${i.link ? `<a href="${esc(i.link)}" target="_blank" rel="noopener">${esc(i.title)}</a>` : esc(i.title)}</h2>
+        ${i.description ? `<p>${esc(i.description)}</p>` : ""}
+        <div class="meta"><span>${esc(i.category)}</span>${(i.tags || []).map(t => `<span class="tag">#${esc(t)}</span>`).join("")}</div>
+      </div>
+      <div class="status s-${esc((i.status || "").toLowerCase().replace(/\s+/g, "-"))}"><span class="dot"></span>${esc(i.status)}</div>
+      <div class="actions">
+        <button class="btn ghost small" data-edit="${esc(i.id)}">Modifica</button>
+        <button class="btn ghost small danger" data-del="${esc(i.id)}">Elimina</button>
+      </div>
+    </li>`).join("")
+    : `<li class="empty">${items.length ? "Nessun progetto corrisponde ai filtri." : "Non ci sono ancora progetti. Aggiungi il primo con “Nuovo progetto”."}</li>`;
+}
+
+function openForm(item) {
+  editingId = item ? item.id : null;
+  $("formTitle").textContent = item ? "Modifica progetto" : "Nuovo progetto";
+  $("f-title").value = item?.title || "";
+  $("f-desc").value = item?.description || "";
+  $("f-cat").value = item?.category || "";
+  $("f-status").value = item?.status || "In corso";
+  $("f-date").value = item?.date || new Date().toISOString().slice(0, 7);
+  $("f-link").value = item?.link || "";
+  $("f-tags").value = (item?.tags || []).join(", ");
+  $("formDlg").showModal();
+  $("f-title").focus();
+}
+
+$("add").onclick = () => openForm(null);
+$("form").onsubmit = e => {
+  if (e.submitter?.id !== "save") return;
+  const data = {
+    id: editingId || "p" + Date.now().toString(36),
+    title: $("f-title").value.trim(),
+    description: $("f-desc").value.trim(),
+    category: $("f-cat").value.trim(),
+    status: $("f-status").value,
+    date: $("f-date").value,
+    link: $("f-link").value.trim(),
+    tags: $("f-tags").value.split(",").map(t => t.trim()).filter(Boolean)
+  };
+  const idx = items.findIndex(i => i.id === editingId);
+  if (idx >= 0) items[idx] = data; else items.push(data);
+  persist(); render();
+};
+$("list").onclick = e => {
+  const ed = e.target.closest("[data-edit]"), del = e.target.closest("[data-del]");
+  if (ed) openForm(items.find(i => i.id === ed.dataset.edit));
+  if (del && confirm("Eliminare questo progetto?")) {
+    items = items.filter(i => i.id !== del.dataset.del); persist(); render();
+  }
+};
+$("q").oninput = e => { query = e.target.value; render(); };
+document.addEventListener("click", e => {
+  const c = e.target.closest("[data-close]");
+  if (c) $(c.dataset.close).close();
+});
+$("export").onclick = () => {
+  $("out").value = "const PROJECTS = " + JSON.stringify(items, null, 2) + ";";
+  $("copy").textContent = "Copia codice";
+  $("exportDlg").showModal();
+};
+$("copy").onclick = async () => {
+  try { await navigator.clipboard.writeText($("out").value); }
+  catch (e) { $("out").select(); document.execCommand("copy"); }
+  $("copy").textContent = "Copiato";
+};
+render();
+</script>
+</body>
+</html>
